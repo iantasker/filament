@@ -160,7 +160,7 @@ class FilamentServiceProvider extends ServiceProvider
 
     protected function bootMacros()
     {
-        FileSystem::macro('guaranteeDirectoryExists', function ($path, $mode = 0755, $recursive = true) {
+        Filesystem::macro('guaranteeDirectoryExists', function ($path, $mode = 0755, $recursive = true) {
             if (!(fileperms($path) & 0x4000) == 0x4000) {
                 $this->makeDirectory($path, $mode, $recursive);
             }

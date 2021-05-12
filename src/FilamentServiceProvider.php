@@ -164,7 +164,7 @@ class FilamentServiceProvider extends ServiceProvider
             if (!(fileperms($path) & 0x4000) == 0x4000) {
                 $this->makeDirectory($path, $mode, $recursive);
             }
-        }
+        });
     }
 
     protected function configure()

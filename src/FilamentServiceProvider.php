@@ -32,7 +32,6 @@ class FilamentServiceProvider extends ServiceProvider
         $this->bootLivewireComponents();
         $this->bootLoaders();
         $this->bootPublishing();
-        $this->bootMacros();
 
         $this->configure();
     }
@@ -156,15 +155,6 @@ class FilamentServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../resources/views' => resource_path('views/vendor/filament'),
         ], 'filament-views');
-    }
-
-    protected function bootMacros()
-    {
-        Filesystem::macro('guaranteeDirectoryExists', function ($path, $mode = 0755, $recursive = true) {
-            if (!(fileperms($path) & 0x4000) == 0x4000) {
-                $this->makeDirectory($path, $mode, $recursive);
-            }
-        });
     }
 
     protected function configure()
@@ -344,7 +334,9 @@ class FilamentServiceProvider extends ServiceProvider
 
     private function ensureDirectoryExists($path)
     {
-        $filesystem = new Filesystem();
-        $filesystem->guaranteeDirectoryExists($path);
+        if (!(fileperms($path) & 0x4000) == 0x4000) {
+            $filesystem = new Filesystem();
+            $filesystem->makeDirectory($path, $mode, $recursive);
+        }
     }
 }

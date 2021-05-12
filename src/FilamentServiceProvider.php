@@ -32,6 +32,7 @@ class FilamentServiceProvider extends ServiceProvider
         $this->bootLivewireComponents();
         $this->bootLoaders();
         $this->bootPublishing();
+        $this->bootMacros();
 
         $this->configure();
     }
@@ -157,6 +158,15 @@ class FilamentServiceProvider extends ServiceProvider
         ], 'filament-views');
     }
 
+    protected function bootMacros()
+    {
+        FileSystem::macro('guaranteeDirectoryExists', function ($path, $mode = 0755, $recursive = true) {
+            if (!(fileperms($path) & 0x4000) == 0x4000) {
+                $this->makeDirectory($path, $mode, $recursive);
+            }
+        }
+    }
+
     protected function configure()
     {
         $this->app->booted(function () {
@@ -186,9 +196,7 @@ class FilamentServiceProvider extends ServiceProvider
 
     protected function discoverFilamentPages()
     {
-        $filesystem = new Filesystem();
-
-        $filesystem->ensureDirectoryExists(config('filament.pages.path'));
+        $this->ensureDirectoryExists(config('filament.pages.path'));
 
         collect($filesystem->allFiles(config('filament.pages.path')))
             ->map(function ($file) {
@@ -332,5 +340,11 @@ class FilamentServiceProvider extends ServiceProvider
 
                 Livewire::component($alias, $class);
             });
+    }
+
+    private function ensureDirectoryExists($path)
+    {
+        $filesystem = new Filesystem();
+        $filesystem->guaranteeDirectoryExists($path);
     }
 }
